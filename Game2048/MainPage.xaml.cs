@@ -1,25 +1,30 @@
-﻿using Microsoft.Maui.Controls.Shapes;
+﻿using Game2048.Enums;
+using Microsoft.Maui.Controls.Shapes;
 
 namespace Game2048
 {
     public partial class MainPage : ContentPage
     {
+        private const int ROWS = 4;
+        private const int COLS = 4;
+
         public MainPage()
         {
             InitializeComponent();
 
-            GameGrid.SetAt(0, 0, Enums.CellType.Type2);
-            GameGrid.SetAt(0, 1, Enums.CellType.Type4);
-            GameGrid.SetAt(0, 2, Enums.CellType.Type8);
-            GameGrid.SetAt(0, 3, Enums.CellType.Type16);
+            this.BindingContext = new
+            {
+                Rows = ROWS,
+                Cols = COLS
+            };
 
-            GameGrid.SetAt(1, 0, Enums.CellType.Type32);
-            GameGrid.SetAt(1, 1, Enums.CellType.Type64);
-            GameGrid.SetAt(1, 2, Enums.CellType.Type128);
-            GameGrid.SetAt(1, 3, Enums.CellType.Type256);
-
-            GameGrid.SetAt(2, 0, Enums.CellType.Empty);
-            GameGrid.SetAt(1, 0, Enums.CellType.Empty);
+            for (int i = 0; i < ROWS; i++)
+            {
+                for (int j = 0; j < COLS; j++)
+                {
+                    GameGrid.SetAt(i, j, CellType.Empty);
+                }
+            }
         }
 
         public void OnSwiped(object sender, SwipedEventArgs e)

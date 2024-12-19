@@ -9,7 +9,7 @@
             <SwipeGestureRecognizer Direction="Left,Right,Up,Down" Swiped="OnSwiped" />
         </ScrollView.GestureRecognizers>
         <VerticalStackLayout HorizontalOptions="Fill">
-            <views:GameGrid x:Name="GameGrid" Rows="4" Cols="4"></views:GameGrid>
+            <views:GameGrid x:Name="GameGrid" Rows="{Binding Rows}" Cols="{Binding Cols}"></views:GameGrid>
         </VerticalStackLayout>
     </ScrollView>
 

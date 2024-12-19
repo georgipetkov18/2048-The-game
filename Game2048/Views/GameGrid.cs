@@ -1,4 +1,5 @@
 using Game2048.Enums;
+using Game2048.Models;
 
 namespace Game2048.Views;
 
@@ -35,6 +36,7 @@ public partial class GameGrid : ContentView
         {
             HorizontalOptions = LayoutOptions.Fill
         };
+
         this.SetupGrid();
 	}
 
@@ -58,29 +60,11 @@ public partial class GameGrid : ContentView
 
     public void SetAt(int row, int col, CellType cellType)
     {
-        if (cellType == CellType.Empty)
-        {
-            this.RemoveAt(row, col);
-            return;
-        }
-
-        var gameCell = new GameCell(((int)cellType).ToString());
+        var gameCell = new GameCell(new GameCellModel(cellType));
         this.grid.Children.Add(gameCell);
         this.grid.SetRow(gameCell, row);
         this.grid.SetColumn(gameCell, col);
 
         this.Content = this.grid;
-    }
-
-    private void RemoveAt(int row, int col)
-    {
-        foreach (var child in this.grid.Children.ToList())
-        {
-            if (this.grid.GetRow(child) == row && this.grid.GetColumn(child) == col)
-            {
-                this.grid.Children.Remove(child);
-                break;
-            }
-        }
     }
 }

@@ -1,5 +1,5 @@
-using Game2048.Enums;
 using Game2048.Models;
+using Game2048.Models.Enums;
 
 namespace Game2048.Views;
 
@@ -31,14 +31,14 @@ public partial class GameGrid : ContentView
     }
 
     public GameGrid()
-	{
+    {
         this.grid = new Grid
         {
-            HorizontalOptions = LayoutOptions.Fill
+            HorizontalOptions = LayoutOptions.Fill,
         };
 
         this.SetupGrid();
-	}
+    }
 
     private void SetupGrid()
     {
@@ -60,11 +60,47 @@ public partial class GameGrid : ContentView
 
     public void SetAt(int row, int col, CellType cellType)
     {
+        var child = this.grid.Children
+                .Where(c => this.grid.GetRow(c) == row && this.grid.GetColumn(c) == col)
+                .FirstOrDefault();
+
+        if (child != null)
+        {
+            this.grid.Children.Remove(child);
+        }
+
         var gameCell = new GameCell(new GameCellModel(cellType));
         this.grid.Children.Add(gameCell);
         this.grid.SetRow(gameCell, row);
         this.grid.SetColumn(gameCell, col);
 
         this.Content = this.grid;
+    }
+
+    public void SetGrid(GameCellModel[,] gameGrid)
+    {
+        for (int i = 0; i < gameGrid.GetLength(0); i++)
+        {
+            for (int j = 0; j < gameGrid.GetLength(1); j++)
+            {
+                var gameCell = new GameCell(gameGrid[i, j]);
+
+                this.grid.Children.Add(gameCell);
+                this.grid.SetRow(gameCell, i);
+                this.grid.SetColumn(gameCell, j);
+
+                this.Content = this.grid;
+            }
+        }
+    }
+
+    public GameCell this[int i, int j]
+    {
+        get
+        {
+            return (GameCell?)this.grid.Children
+                .Where(c => this.grid.GetRow(c) == i && this.grid.GetColumn(c) == j)
+                .FirstOrDefault() ?? throw new IndexOutOfRangeException();
+        }
     }
 }

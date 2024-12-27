@@ -1,5 +1,6 @@
-﻿using Game2048.Enums;
-using Microsoft.Maui.Controls.Shapes;
+﻿
+using Game2048.Models;
+using Game2048.Models.Enums;
 
 namespace Game2048
 {
@@ -7,6 +8,8 @@ namespace Game2048
     {
         private const int ROWS = 4;
         private const int COLS = 4;
+
+        private GameModel game;
 
         public MainPage()
         {
@@ -18,33 +21,66 @@ namespace Game2048
                 Cols = COLS
             };
 
-            for (int i = 0; i < ROWS; i++)
-            {
-                for (int j = 0; j < COLS; j++)
-                {
-                    GameGrid.SetAt(i, j, CellType.Empty);
-                }
-            }
+            this.game = new GameModel(ROWS, COLS);
+
+            this.GameGrid.SetGrid(this.game.Grid);
         }
 
-        public void OnSwiped(object sender, SwipedEventArgs e)
+        public async void OnSwiped(object sender, SwipedEventArgs e)
         {
-            if (e.Direction == SwipeDirection.Left)
+            for (int i = 0; i < this.game.Grid.GetLength(0); i++)
             {
+                for (int j = 0; j < this.game.Grid.GetLength(1); j++)
+                {
+                    var currentCell = this.game.Grid[i, j];
+                    if (currentCell.Type != CellType.Empty)
+                    {
+                        var updateAtRow = i;
+                        var updateAtCol = j;
 
-            }
-            else if (e.Direction == SwipeDirection.Right)
-            {
+                        if (e.Direction == SwipeDirection.Left)
+                        {
+                            while (updateAtCol > 0)
+                            {
+                                //await this.GameGrid[i, j].Move(e.Direction);
+                                updateAtCol--;
+                            }
+                        }
+                        else if (e.Direction == SwipeDirection.Right)
+                        {
+                            while (updateAtCol < this.game.Grid.GetLength(1) - 1)
+                            {
+                                //await this.GameGrid[i, j].Move(e.Direction);
+                                updateAtCol++;
+                            }
+                        }
+                        else if (e.Direction == SwipeDirection.Up)
+                        {
+                            while (updateAtRow > 0)
+                            {
+                                //await this.GameGrid[i, j].Move(e.Direction);
+                                updateAtRow--;
+                            }
+                        }
+                        else if (e.Direction == SwipeDirection.Down)
+                        {
+                            while (updateAtRow < this.game.Grid.GetLength(0) - 1)
+                            {
+                                //await this.GameGrid[i, j].Move(e.Direction);
+                                updateAtRow++;
+                            }
+                        }
+                        await this.GameGrid[i, j].Move(e.Direction, Math.Abs(j - updateAtCol), Math.Abs(i - updateAtRow));
 
+                        this.game.UpdateAt(i, j, CellType.Empty);
+                        this.GameGrid.SetAt(i, j, CellType.Empty);
+                        this.game.UpdateAt(updateAtRow, updateAtCol, currentCell.Type);
+                        this.GameGrid.SetAt(updateAtRow, updateAtCol, currentCell.Type);
+                    }
+                }
             }
-            else if (e.Direction == SwipeDirection.Up)
-            {
 
-            }
-            else if (e.Direction == SwipeDirection.Down)
-            {
-
-            }
+            //this.ForceLayout();
         }
     }
 

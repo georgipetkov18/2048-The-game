@@ -1,4 +1,4 @@
-﻿namespace Game2048.Enums
+﻿namespace Game2048.Models.Enums
 {
     public enum CellType
     {

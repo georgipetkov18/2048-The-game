@@ -1,5 +1,6 @@
 using Game2048.Models;
 using Game2048.Models.Enums;
+using Microsoft.Maui.Controls.Shapes;
 
 namespace Game2048.Views;
 
@@ -84,10 +85,21 @@ public partial class GameGrid : ContentView
             for (int j = 0; j < gameGrid.GetLength(1); j++)
             {
                 var gameCell = new GameCell(gameGrid[i, j]);
-
+                var box = new Border 
+                {
+                    Stroke = Colors.LightGray,
+                    StrokeThickness = 2,
+                    StrokeShape = new RoundRectangle
+                    {
+                        CornerRadius = new CornerRadius(10)
+                    },
+                };
                 this.grid.Children.Add(gameCell);
+                this.grid.Add(box);
                 this.grid.SetRow(gameCell, i);
+                this.grid.SetRow(box, i);
                 this.grid.SetColumn(gameCell, j);
+                this.grid.SetColumn(box, j);
 
                 this.Content = this.grid;
             }
@@ -99,7 +111,7 @@ public partial class GameGrid : ContentView
         get
         {
             return (GameCell?)this.grid.Children
-                .Where(c => this.grid.GetRow(c) == i && this.grid.GetColumn(c) == j)
+                .Where(c => this.grid.GetRow(c) == i && this.grid.GetColumn(c) == j && c.GetType() == typeof(GameCell))
                 .FirstOrDefault() ?? throw new IndexOutOfRangeException();
         }
     }

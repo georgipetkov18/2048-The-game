@@ -6,13 +6,14 @@ namespace Game2048.Views;
 
 public partial class GameCell : ContentView
 {
-    private const int PADDING = 5;
+    private const int MARGIN = 5;
     private Border? innerContent;
 
     public GameCell(GameCellModel gameCellModel)
     {
         this.innerContent = gameCellModel.Type != CellType.Empty ? new Border
         {
+            Margin = MARGIN,
             BackgroundColor = Colors.Aquamarine,
             StrokeShape = new RoundRectangle
             {
@@ -28,17 +29,7 @@ public partial class GameCell : ContentView
             },
         } : null;
 
-        this.Content = new Border
-        {
-            Stroke = Brush.LightGray,
-            Padding = PADDING,
-            StrokeThickness = 2,
-            StrokeShape = new RoundRectangle
-            {
-                CornerRadius = new CornerRadius(10)
-            },
-            Content = this.innerContent,
-        };
+        this.Content = this.innerContent;
     }
 
     public async Task Move(SwipeDirection direction, int cellsCrossedX, int cellsCrossedY)
@@ -51,15 +42,15 @@ public partial class GameCell : ContentView
 
         var translateToX = direction switch
         {
-            SwipeDirection.Left => -(this.innerContent.Width + (2 * PADDING)),
-            SwipeDirection.Right => this.innerContent.Width + (2 * PADDING),
+            SwipeDirection.Left => -(this.innerContent.Width + (2 * MARGIN)),
+            SwipeDirection.Right => this.innerContent.Width + (2 * MARGIN),
             _ => 0
         };
 
         var translateToY = direction switch
         {
-            SwipeDirection.Up => -(this.innerContent.Height + (2 * PADDING)),
-            SwipeDirection.Down => this.innerContent.Height + (2 * PADDING),
+            SwipeDirection.Up => -(this.innerContent.Height + (2 * MARGIN)),
+            SwipeDirection.Down => this.innerContent.Height + (2 * MARGIN),
             _ => 0
         };
         //await this.Content.TranslateTo(cellsCrossedX * translateToX, cellsCrossedY * translateToY);

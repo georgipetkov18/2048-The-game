@@ -54,6 +54,6 @@ public partial class GameCell : ContentView
             _ => 0
         };
         //await this.Content.TranslateTo(cellsCrossedX * translateToX, cellsCrossedY * translateToY);
-        await this.innerContent.TranslateTo(cellsCrossedX * translateToX, cellsCrossedY * translateToY);
+        await this.innerContent.TranslateTo(cellsCrossedX * translateToX, cellsCrossedY * translateToY, 150);
     }
 }

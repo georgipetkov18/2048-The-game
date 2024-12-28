@@ -61,19 +61,31 @@ public partial class GameGrid : ContentView
 
     public void SetAt(int row, int col, CellType cellType)
     {
-        var child = this.grid.Children
+        var children = this.grid.Children
                 .Where(c => this.grid.GetRow(c) == row && this.grid.GetColumn(c) == col)
-                .FirstOrDefault();
+                .ToList();
 
-        if (child != null)
+        if (children.Count > 0)
         {
-            this.grid.Children.Remove(child);
+            children.ForEach(c => this.grid.Children.Remove(c));
         }
 
         var gameCell = new GameCell(new GameCellModel(cellType));
+        var border = new Border
+        {
+            Stroke = Colors.LightGray,
+            StrokeThickness = 2,
+            StrokeShape = new RoundRectangle
+            {
+                CornerRadius = new CornerRadius(10)
+            },
+        };
         this.grid.Children.Add(gameCell);
+        this.grid.Children.Add(border);
         this.grid.SetRow(gameCell, row);
+        this.grid.SetRow(border, row);
         this.grid.SetColumn(gameCell, col);
+        this.grid.SetColumn(border, col);
 
         this.Content = this.grid;
     }
@@ -85,7 +97,7 @@ public partial class GameGrid : ContentView
             for (int j = 0; j < gameGrid.GetLength(1); j++)
             {
                 var gameCell = new GameCell(gameGrid[i, j]);
-                var box = new Border 
+                var border = new Border 
                 {
                     Stroke = Colors.LightGray,
                     StrokeThickness = 2,
@@ -95,11 +107,11 @@ public partial class GameGrid : ContentView
                     },
                 };
                 this.grid.Children.Add(gameCell);
-                this.grid.Add(box);
+                this.grid.Add(border);
                 this.grid.SetRow(gameCell, i);
-                this.grid.SetRow(box, i);
+                this.grid.SetRow(border, i);
                 this.grid.SetColumn(gameCell, j);
-                this.grid.SetColumn(box, j);
+                this.grid.SetColumn(border, j);
 
                 this.Content = this.grid;
             }

@@ -1,8 +1,7 @@
-using Game2048.Models;
 using Game2048.Models.Enums;
 using Microsoft.Maui.Controls.Shapes;
 
-namespace Game2048.Views;
+namespace Game2048.Models.Views;
 
 public partial class GameGrid : ContentView
 {

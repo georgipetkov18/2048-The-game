@@ -28,74 +28,103 @@ namespace Game2048
         {
             var tasks = new List<Task>();
 
-            for (int i = 0; i < this.game.Grid.GetLength(0); i++)
+            if (e.Direction == SwipeDirection.Left || e.Direction == SwipeDirection.Up)
             {
-                for (int j = 0; j < this.game.Grid.GetLength(1); j++)
+                for (int i = 0; i < this.game.Grid.GetLength(0); i++)
                 {
-                    var currentCell = this.game.Grid[i, j];
-
-                    if (currentCell.Type != CellType.Empty)
+                    for (int j = 0; j < this.game.Grid.GetLength(1); j++)
                     {
-                        var updateAtRow = i;
-                        var updateAtCol = j;
+                        var currentCell = this.game.Grid[i, j];
+                        var nextCellType = currentCell.Type;
 
-                        if (e.Direction == SwipeDirection.Left)
+                        if (currentCell.Type != CellType.Empty)
                         {
-                            // NOT FINAL CONDITION NEED TO CHECK FOR ALL TYPES EXCEPT ITS OWN AND IF IT'S ITS OWN NEED TO MERGE
-                            while (updateAtCol > 0 && this.game.Grid[i, updateAtCol - 1].Type == CellType.Empty)
+                            var updateAtRow = i;
+                            var updateAtCol = j;
+
+                            if (e.Direction == SwipeDirection.Left)
                             {
-                                //await this.GameGrid[i, j].Move(e.Direction);
-                                updateAtCol--;
+                                while (updateAtCol > 0 && (this.game.Grid[i, updateAtCol - 1].Type == CellType.Empty || this.game.Grid[i, updateAtCol - 1].Type == nextCellType))
+                                {
+                                    this.PrepareCellType(i, updateAtCol - 1, ref nextCellType);
+                                    updateAtCol--;
+                                }
                             }
-                        }
-                        else if (e.Direction == SwipeDirection.Right)
-                        {
-                            while (updateAtCol < this.game.Grid.GetLength(1) - 1 && this.game.Grid[i, updateAtCol + 1].Type == CellType.Empty)
+
+                            else if (e.Direction == SwipeDirection.Up)
                             {
-                                //await this.GameGrid[i, j].Move(e.Direction);
-                                updateAtCol++;
+                                while (updateAtRow > 0 && (this.game.Grid[updateAtRow - 1, j].Type == CellType.Empty || this.game.Grid[updateAtRow - 1, j].Type == nextCellType))
+                                {
+                                    this.PrepareCellType(updateAtRow - 1, j, ref nextCellType);
+                                    updateAtRow--;
+                                }
                             }
-                        }
-                        else if (e.Direction == SwipeDirection.Up)
-                        {
-                            while (updateAtRow > 0 && this.game.Grid[updateAtRow - 1, j].Type == CellType.Empty)
+
+                            if (updateAtRow == i && updateAtCol == j)
                             {
-                                //await this.GameGrid[i, j].Move(e.Direction);
-                                updateAtRow--;
+                                continue;
                             }
+
+                            tasks.Add(this.game.MoveCellAsync(e.Direction, nextCellType, i, updateAtRow, j, updateAtCol));
                         }
-                        else if (e.Direction == SwipeDirection.Down)
+                    }
+                }
+            }
+
+            else if (e.Direction == SwipeDirection.Right || e.Direction == SwipeDirection.Down)
+            {
+                for (int i = this.game.Grid.GetLength(0) - 1; i >= 0; i--)
+                {
+                    for (int j = this.game.Grid.GetLength(1) - 1; j >= 0; j--)
+                    {
+                        var currentCell = this.game.Grid[i, j];
+                        var nextCellType = currentCell.Type;
+
+                        if (currentCell.Type != CellType.Empty)
                         {
-                            while (updateAtRow < this.game.Grid.GetLength(0) - 1 && this.game.Grid[updateAtRow + 1, j].Type == CellType.Empty)
+                            var updateAtRow = i;
+                            var updateAtCol = j;
+
+                            if (e.Direction == SwipeDirection.Right)
                             {
-                                //await this.GameGrid[i, j].Move(e.Direction);
-                                updateAtRow++;
+                                while (updateAtCol < this.game.Grid.GetLength(1) - 1 && (this.game.Grid[i, updateAtCol + 1].Type == CellType.Empty || this.game.Grid[i, updateAtCol + 1].Type == nextCellType))
+                                {
+                                    this.PrepareCellType(i, updateAtCol + 1, ref nextCellType);
+                                    updateAtCol++;
+                                }
                             }
+
+                            else if (e.Direction == SwipeDirection.Down)
+                            {
+                                while (updateAtRow < this.game.Grid.GetLength(0) - 1 && (this.game.Grid[updateAtRow + 1, j].Type == CellType.Empty || this.game.Grid[updateAtRow + 1, j].Type == nextCellType))
+                                {
+                                    this.PrepareCellType(updateAtRow + 1, j, ref nextCellType);
+                                    updateAtRow++;
+                                }
+                            }
+
+                            if (updateAtRow == i && updateAtCol == j)
+                            {
+                                continue;
+                            }
+
+                            tasks.Add(this.game.MoveCellAsync(e.Direction, nextCellType, i, updateAtRow, j, updateAtCol));
                         }
-
-                        if (updateAtRow == i && updateAtCol == j)
-                        {
-                            continue;
-                        }
-
-                        tasks.Add(this.game.MoveCellAsync(e.Direction, currentCell.Type, i, updateAtRow, j, updateAtCol));
-
-                        //tasks.Add(this.GameGrid[i, j].MoveAsync(e.Direction, Math.Abs(j - updateAtCol), Math.Abs(i - updateAtRow)).ContinueWith((t) =>
-                        //{
-                        //    this.game.UpdateAt(i, j, CellType.Empty);
-                        //    this.game.UpdateAt(updateAtRow, updateAtCol, currentCell.Type);
-                        //}));
-                        //await this.GameGrid[i, j].MoveAsync(e.Direction, Math.Abs(j - updateAtCol), Math.Abs(i - updateAtRow));
-
-                        //this.game.UpdateAt(i, j, CellType.Empty);
-                        //this.game.UpdateAt(updateAtRow, updateAtCol, currentCell.Type);
                     }
                 }
             }
             await Task.WhenAll(tasks);
             this.game.CreateNewBaseCell();
+        }
 
-            //this.ForceLayout();
+        private void PrepareCellType(int row, int col, ref CellType nextCellType)
+        {
+            //TODO: Need to update the column I start to move to empty somehow because it is buggy especially when 3 cells on one row or col
+            if (this.game.Grid[row, col].Type == nextCellType)
+            {
+                var currentTypeValue = (int)this.game.Grid[row, col].Type;
+                nextCellType = (CellType)(currentTypeValue * 2);
+            }
         }
     }
 

@@ -51,8 +51,6 @@ public partial class GameCell : ContentView
             SwipeDirection.Down => innerContent.Height + 2 * MARGIN,
             _ => 0
         };
-        //await this.Content.TranslateTo(cellsCrossedX * translateToX, cellsCrossedY * translateToY);
-        //await innerContent.TranslateTo(cellsCrossedX * translateToX, cellsCrossedY * translateToY, 2000);
         await innerContent.TranslateTo(cellsCrossedX * translateToX, cellsCrossedY * translateToY, 150);
     }
 }

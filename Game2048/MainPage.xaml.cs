@@ -64,9 +64,8 @@ namespace Game2048
                             {
                                 continue;
                             }
-                            this.game.UpdateAt(i, j, CellType.Empty);
-                            //this.game.Grid[i, j] = new GameCellModel(CellType.Empty);
-                            this.game.UpdateAt(updateAtRow, updateAtCol, nextCellType);
+                            this.game.Grid[i, j] = new GameCellModel(CellType.Empty);
+                            this.game.Grid[updateAtRow, updateAtCol] = new GameCellModel(nextCellType);
 
                             tasks.Add(this.game.MoveCellAsync(e.Direction, nextCellType, i, updateAtRow, j, updateAtCol));
                         }
@@ -110,10 +109,8 @@ namespace Game2048
                             {
                                 continue;
                             }
-                            this.game.UpdateAt(i, j, CellType.Empty);
-                            //this.game.Grid[i, j] = new GameCellModel(CellType.Empty);
-                            this.game.UpdateAt(updateAtRow, updateAtCol, nextCellType);
-
+                            this.game.Grid[i, j] = new GameCellModel(CellType.Empty);
+                            this.game.Grid[updateAtRow, updateAtCol] = new GameCellModel(nextCellType);
 
                             tasks.Add(this.game.MoveCellAsync(e.Direction, nextCellType, i, updateAtRow, j, updateAtCol));
                         }
@@ -126,13 +123,10 @@ namespace Game2048
 
         private void PrepareCellType(int prevRow, int prevCol, int row, int col, ref CellType nextCellType)
         {
-            //TODO: Need to update the column I start to move to empty somehow because it is buggy especially when 3 cells on one row or col
             if (this.game.Grid[row, col].Type == nextCellType)
             {
                 var currentTypeValue = (int)this.game.Grid[row, col].Type;
                 nextCellType = (CellType)(currentTypeValue * 2);
-                //this.game.Grid[prevRow, prevCol] = new GameCellModel(CellType.Empty);
-                //this.game.UpdateAt(prevRow, prevCol, CellType.Empty);
             }
         }
     }

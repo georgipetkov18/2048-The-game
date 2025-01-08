@@ -5,7 +5,7 @@ namespace Game2048.Models
 {
     public class GameModel
     {
-        private readonly List<int> usedCellIndexes;
+        private readonly HashSet<int> usedCellIndexes;
         private readonly GameGrid gameGridView;
         private readonly int rowsCount;
         private readonly int colsCount;
@@ -14,7 +14,7 @@ namespace Game2048.Models
 
         public GameModel(GameGrid gameGridView, int rows, int cols)
         {
-            this.usedCellIndexes = new List<int>();
+            this.usedCellIndexes = new HashSet<int>();
             this.gameGridView = gameGridView;
             this.rowsCount = rows;
             this.colsCount = cols;
@@ -43,7 +43,6 @@ namespace Game2048.Models
                     }
                 }
             }
-
             this.gameGridView.SetGrid(this.Grid);
         }
 
@@ -91,8 +90,8 @@ namespace Game2048.Models
         {
             await this.gameGridView[fromRow, fromCol].MoveAsync(direction, Math.Abs(fromCol - toCol), Math.Abs(fromRow - toRow));
             this.UpdateAt(fromRow, fromCol, CellType.Empty);
+            this.UpdateAt(toRow, toCol, cellType);
 
-            var a = this.Grid;
             switch (direction)
             {
                 case SwipeDirection.Right:

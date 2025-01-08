@@ -121,7 +121,7 @@ public partial class GameGrid : ContentView
     {
         get
         {
-            return (GameCell?)this.grid.Children
+            return (GameCell)this.grid.Children
                 .Where(c => this.grid.GetRow(c) == i && this.grid.GetColumn(c) == j && c.GetType() == typeof(GameCell))
                 .FirstOrDefault() ?? throw new IndexOutOfRangeException();
         }

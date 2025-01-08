@@ -91,7 +91,42 @@ namespace Game2048.Models
         {
             await this.gameGridView[fromRow, fromCol].MoveAsync(direction, Math.Abs(fromCol - toCol), Math.Abs(fromRow - toRow));
             this.UpdateAt(fromRow, fromCol, CellType.Empty);
-            this.UpdateAt(toRow, toCol, cellType);
+
+            var a = this.Grid;
+            switch (direction)
+            {
+                case SwipeDirection.Right:
+                    while (fromCol < toCol)
+                    {
+                        this.UpdateAt(fromRow, fromCol, CellType.Empty);
+                        fromCol++;
+                    }
+                    break;
+                case SwipeDirection.Left:
+                    while (fromCol > toCol)
+                    {
+                        this.UpdateAt(fromRow, fromCol, CellType.Empty);
+                        fromCol--;
+                    }
+                    break;
+                case SwipeDirection.Up:
+                    while (fromRow > toRow)
+                    {
+                        this.UpdateAt(fromRow, fromCol, CellType.Empty);
+                        fromRow--;
+                    }
+                    break;
+                case SwipeDirection.Down:
+                    while (fromRow < toRow)
+                    {
+                        this.UpdateAt(fromRow, fromCol, CellType.Empty);
+                        fromRow++;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            //this.UpdateAt(toRow, toCol, cellType);
         }
 
         private int GetIndex(int row, int col) => this.colsCount * row + col;

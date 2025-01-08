@@ -46,7 +46,7 @@ namespace Game2048
                             {
                                 while (updateAtCol > 0 && (this.game.Grid[i, updateAtCol - 1].Type == CellType.Empty || this.game.Grid[i, updateAtCol - 1].Type == nextCellType))
                                 {
-                                    this.PrepareCellType(i, updateAtCol - 1, ref nextCellType);
+                                    this.PrepareCellType(updateAtRow, updateAtCol, i, updateAtCol - 1, ref nextCellType);
                                     updateAtCol--;
                                 }
                             }
@@ -55,7 +55,7 @@ namespace Game2048
                             {
                                 while (updateAtRow > 0 && (this.game.Grid[updateAtRow - 1, j].Type == CellType.Empty || this.game.Grid[updateAtRow - 1, j].Type == nextCellType))
                                 {
-                                    this.PrepareCellType(updateAtRow - 1, j, ref nextCellType);
+                                    this.PrepareCellType(updateAtRow, updateAtCol, updateAtRow - 1, j, ref nextCellType);
                                     updateAtRow--;
                                 }
                             }
@@ -64,6 +64,9 @@ namespace Game2048
                             {
                                 continue;
                             }
+                            this.game.UpdateAt(i, j, CellType.Empty);
+                            //this.game.Grid[i, j] = new GameCellModel(CellType.Empty);
+                            this.game.UpdateAt(updateAtRow, updateAtCol, nextCellType);
 
                             tasks.Add(this.game.MoveCellAsync(e.Direction, nextCellType, i, updateAtRow, j, updateAtCol));
                         }
@@ -89,7 +92,7 @@ namespace Game2048
                             {
                                 while (updateAtCol < this.game.Grid.GetLength(1) - 1 && (this.game.Grid[i, updateAtCol + 1].Type == CellType.Empty || this.game.Grid[i, updateAtCol + 1].Type == nextCellType))
                                 {
-                                    this.PrepareCellType(i, updateAtCol + 1, ref nextCellType);
+                                    this.PrepareCellType(updateAtRow, updateAtCol, i, updateAtCol + 1, ref nextCellType);
                                     updateAtCol++;
                                 }
                             }
@@ -98,7 +101,7 @@ namespace Game2048
                             {
                                 while (updateAtRow < this.game.Grid.GetLength(0) - 1 && (this.game.Grid[updateAtRow + 1, j].Type == CellType.Empty || this.game.Grid[updateAtRow + 1, j].Type == nextCellType))
                                 {
-                                    this.PrepareCellType(updateAtRow + 1, j, ref nextCellType);
+                                    this.PrepareCellType(updateAtRow, updateAtCol, updateAtRow + 1, j, ref nextCellType);
                                     updateAtRow++;
                                 }
                             }
@@ -107,6 +110,10 @@ namespace Game2048
                             {
                                 continue;
                             }
+                            this.game.UpdateAt(i, j, CellType.Empty);
+                            //this.game.Grid[i, j] = new GameCellModel(CellType.Empty);
+                            this.game.UpdateAt(updateAtRow, updateAtCol, nextCellType);
+
 
                             tasks.Add(this.game.MoveCellAsync(e.Direction, nextCellType, i, updateAtRow, j, updateAtCol));
                         }
@@ -117,15 +124,16 @@ namespace Game2048
             this.game.CreateNewBaseCell();
         }
 
-        private void PrepareCellType(int row, int col, ref CellType nextCellType)
+        private void PrepareCellType(int prevRow, int prevCol, int row, int col, ref CellType nextCellType)
         {
             //TODO: Need to update the column I start to move to empty somehow because it is buggy especially when 3 cells on one row or col
             if (this.game.Grid[row, col].Type == nextCellType)
             {
                 var currentTypeValue = (int)this.game.Grid[row, col].Type;
                 nextCellType = (CellType)(currentTypeValue * 2);
+                //this.game.Grid[prevRow, prevCol] = new GameCellModel(CellType.Empty);
+                //this.game.UpdateAt(prevRow, prevCol, CellType.Empty);
             }
         }
     }
-
 }

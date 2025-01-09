@@ -27,7 +27,7 @@ public partial class GameGrid : ContentView
 
     private static void OnGridSizeChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        (bindable as GameGrid)?.SetupGrid();
+        (bindable as GameGrid)?.InitializeGrid();
     }
 
     public GameGrid()
@@ -35,13 +35,15 @@ public partial class GameGrid : ContentView
         this.grid = new Grid
         {
             HorizontalOptions = LayoutOptions.Fill,
+            Margin = 10
         };
 
-        this.SetupGrid();
+        this.InitializeGrid();
     }
 
-    private void SetupGrid()
+    public void InitializeGrid()
     {
+        this.grid.Children.Clear();
         this.grid.RowDefinitions.Clear();
         this.grid.ColumnDefinitions.Clear();
 

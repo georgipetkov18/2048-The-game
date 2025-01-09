@@ -1,6 +1,8 @@
 ﻿
 using Game2048.Models;
 using Game2048.Models.Enums;
+using Game2048.Models.Extensions;
+using Game2048.ViewModels;
 
 namespace Game2048
 {
@@ -15,10 +17,11 @@ namespace Game2048
         {
             InitializeComponent();
 
-            this.BindingContext = new
+            this.BindingContext = new GameScreenViewModel
             {
                 Rows = ROWS,
-                Cols = COLS
+                Cols = COLS,
+                IsGameOver = false
             };
 
             this.game = new GameModel(this.GameGrid, ROWS, COLS);
@@ -118,7 +121,12 @@ namespace Game2048
                 }
             }
             await Task.WhenAll(tasks);
-            this.game.CreateNewBaseCell();
+            var canCreateNewCell = this.game.CreateNewBaseCell();
+
+            if (!canCreateNewCell)
+            {
+                this.SwitchGameState(GameState.Lost);
+            }
         }
 
         private void PrepareCellType(int prevRow, int prevCol, int row, int col, ref CellType nextCellType)
@@ -128,6 +136,24 @@ namespace Game2048
                 var currentTypeValue = (int)this.game.Grid[row, col].Type;
                 nextCellType = (CellType)(currentTypeValue * 2);
             }
+        }
+        private void OnNewGameBtnClicked(object sender, EventArgs e)
+        {
+            this.GameGrid.InitializeGrid();
+            this.game = new GameModel(this.GameGrid, ROWS, COLS);
+            this.SwitchGameState(GameState.Running);
+        }
+
+        private void SwitchGameState(GameState state)
+        {
+            this.gameScreenViewModel.IsGameOver = state != GameState.Running;
+            this.BindingContext = new GameScreenViewModel
+            {
+                Rows = ROWS,
+                Cols = COLS,
+                IsGameOver = this.gameScreenViewModel.IsGameOver,
+                Text = state.GetDescription(),
+            };
         }
     }
 }

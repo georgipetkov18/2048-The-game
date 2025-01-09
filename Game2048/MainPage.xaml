@@ -9,7 +9,9 @@
             <SwipeGestureRecognizer Direction="Left,Right,Up,Down" Swiped="OnSwiped" />
         </ScrollView.GestureRecognizers>
         <VerticalStackLayout HorizontalOptions="Fill">
+            <Label HorizontalOptions="Center" FontSize="40" Margin="30" IsVisible="{Binding IsGameOver}" Text="{Binding Text}}"></Label>
             <views:GameGrid x:Name="GameGrid" Rows="{Binding Rows}" Cols="{Binding Cols}"></views:GameGrid>
+            <Button Text="Start new game" BackgroundColor="Gray" FontSize="25" WidthRequest="230" Margin="30" Padding="15" Clicked="OnNewGameBtnClicked"></Button>
         </VerticalStackLayout>
     </ScrollView>
 

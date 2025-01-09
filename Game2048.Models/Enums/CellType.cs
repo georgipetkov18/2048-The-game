@@ -1,4 +1,6 @@
-﻿namespace Game2048.Models.Enums
+﻿using System.ComponentModel;
+
+namespace Game2048.Models.Enums
 {
     public enum CellType
     {

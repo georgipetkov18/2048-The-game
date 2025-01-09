@@ -10,6 +10,7 @@ namespace Game2048
     {
         private const int ROWS = 4;
         private const int COLS = 4;
+        private GameState gameState;
 
         private GameModel game;
 
@@ -24,12 +25,17 @@ namespace Game2048
                 IsGameOver = false
             };
 
+            this.gameState = GameState.Running;
             this.game = new GameModel(this.GameGrid, ROWS, COLS);
         }
 
         public async void OnSwiped(object sender, SwipedEventArgs e)
         {
-            // TODO: Need to check if 2048 is present and if so change game state to Won
+            if (this.gameState != GameState.Running)
+            {
+                return;
+            }
+
             var tasks = new List<Task>();
 
             if (e.Direction == SwipeDirection.Left || e.Direction == SwipeDirection.Up)
@@ -70,6 +76,11 @@ namespace Game2048
                             }
                             this.game.Grid[i, j] = new GameCellModel(CellType.Empty);
                             this.game.Grid[updateAtRow, updateAtCol] = new GameCellModel(nextCellType);
+
+                            if (nextCellType == CellType.Type2048)
+                            {
+                                this.SwitchGameState(GameState.Won);
+                            }
 
                             tasks.Add(this.game.MoveCellAsync(e.Direction, nextCellType, i, updateAtRow, j, updateAtCol));
                         }
@@ -148,6 +159,7 @@ namespace Game2048
 
         private void SwitchGameState(GameState state)
         {
+            this.gameState = state;
             this.BindingContext = new GameScreenViewModel
             {
                 Rows = ROWS,

@@ -65,6 +65,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Game2048.DataAccess\Game2048.DataAccess.csproj" />
 	  <ProjectReference Include="..\Game2048.Models\Game2048.Models.csproj" />
 	</ItemGroup>
 

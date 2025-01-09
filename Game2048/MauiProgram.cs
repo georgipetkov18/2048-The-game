@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Game2048.DataAccess.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace Game2048
 {
@@ -15,6 +16,8 @@ namespace Game2048
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
+
+            builder.Services.AddSingleton<ScoreRepository>();
 #if DEBUG
     		builder.Logging.AddDebug();
 #endif

@@ -1,4 +1,5 @@
 ﻿
+using Game2048.DataAccess.Repositories;
 using Game2048.Models;
 using Game2048.Models.Enums;
 using Game2048.Models.Extensions;
@@ -10,14 +11,14 @@ namespace Game2048
     {
         private const int ROWS = 4;
         private const int COLS = 4;
+        private readonly ScoreRepository scoreRepository;
         private GameState gameState;
 
         private GameModel game;
 
-        public MainPage()
+        public MainPage(ScoreRepository scoreRepository)
         {
             InitializeComponent();
-
             this.BindingContext = new GameScreenViewModel
             {
                 Rows = ROWS,
@@ -27,6 +28,7 @@ namespace Game2048
 
             this.gameState = GameState.Running;
             this.game = new GameModel(this.GameGrid, ROWS, COLS);
+            this.scoreRepository = scoreRepository;
         }
 
         public async void OnSwiped(object sender, SwipedEventArgs e)
@@ -79,6 +81,8 @@ namespace Game2048
 
                             if (nextCellType == CellType.Type2048)
                             {
+                                // TODO: Add proper score to repository
+                                await scoreRepository.SaveScoreAsync(new DataAccess.Entities.Score { Id = Guid.NewGuid(), CreatedOn = DateTime.Now, Moves = 0, Points = 2048 });
                                 this.SwitchGameState(GameState.Won);
                             }
 
@@ -126,6 +130,13 @@ namespace Game2048
                             }
                             this.game.Grid[i, j] = new GameCellModel(CellType.Empty);
                             this.game.Grid[updateAtRow, updateAtCol] = new GameCellModel(nextCellType);
+
+                            if (nextCellType == CellType.Type2048)
+                            {
+                                // TODO: Add proper score to repository
+                                await scoreRepository.SaveScoreAsync(new DataAccess.Entities.Score { Id = Guid.NewGuid(), CreatedOn = DateTime.Now, Moves = 0, Points = 2048 });
+                                this.SwitchGameState(GameState.Won);
+                            }
 
                             tasks.Add(this.game.MoveCellAsync(e.Direction, nextCellType, i, updateAtRow, j, updateAtCol));
                         }

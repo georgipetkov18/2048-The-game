@@ -29,6 +29,7 @@ namespace Game2048
 
         public async void OnSwiped(object sender, SwipedEventArgs e)
         {
+            // TODO: Need to check if 2048 is present and if so change game state to Won
             var tasks = new List<Task>();
 
             if (e.Direction == SwipeDirection.Left || e.Direction == SwipeDirection.Up)
@@ -120,6 +121,7 @@ namespace Game2048
                     }
                 }
             }
+
             await Task.WhenAll(tasks);
             var canCreateNewCell = this.game.CreateNewBaseCell();
 
@@ -146,12 +148,11 @@ namespace Game2048
 
         private void SwitchGameState(GameState state)
         {
-            this.gameScreenViewModel.IsGameOver = state != GameState.Running;
             this.BindingContext = new GameScreenViewModel
             {
                 Rows = ROWS,
                 Cols = COLS,
-                IsGameOver = this.gameScreenViewModel.IsGameOver,
+                IsGameOver = state != GameState.Running,
                 Text = state.GetDescription(),
             };
         }

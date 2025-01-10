@@ -69,4 +69,10 @@
 	  <ProjectReference Include="..\Game2048.Models\Game2048.Models.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <MauiXaml Update="ScoreboardPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
 </Project>

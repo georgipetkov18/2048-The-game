@@ -10,8 +10,21 @@
             <SwipeGestureRecognizer Direction="Left,Right,Up,Down" Swiped="OnSwiped" />
         </ScrollView.GestureRecognizers>
         <VerticalStackLayout HorizontalOptions="Fill">
-            <Label HorizontalOptions="Center" FontSize="40" Margin="30" IsVisible="{Binding IsGameOver}" Text="{Binding Text}}"></Label>
+            <Label HorizontalOptions="Center" FontSize="40" Margin="30" IsVisible="{Binding IsGameOver}" Text="{Binding Text}"></Label>
             <views:GameGrid x:Name="GameGrid" Rows="{Binding Rows}" Cols="{Binding Cols}"></views:GameGrid>
+            <Grid HorizontalOptions="End">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" FontSize="17" Margin="0, 25, 0, 0">Score:</Label>
+                <Label Grid.Row="0" Grid.Column="1" FontSize="17" Margin="25, 25, 15, 0" Text="{Binding Score}"></Label>
+            </Grid>
             <Button Text="Start new game" BackgroundColor="Gray" FontSize="25" WidthRequest="230" Margin="30" Padding="15" Clicked="OnNewGameBtnClicked"></Button>
         </VerticalStackLayout>
     </ScrollView>

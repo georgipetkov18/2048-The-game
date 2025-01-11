@@ -2,7 +2,6 @@
 using Game2048.DataAccess.Repositories;
 using Game2048.Models;
 using Game2048.Models.Enums;
-using Game2048.Models.Extensions;
 using Game2048.ViewModels;
 
 namespace Game2048
@@ -12,24 +11,25 @@ namespace Game2048
         private const int ROWS = 4;
         private const int COLS = 4;
         private readonly ScoreRepository scoreRepository;
-        private GameState gameState;
-        private int currentPoints;
         private int currentMoves;
 
         private GameModel game;
 
+        private GameScreenViewModel gameScreenViewModel;
+
         public MainPage(ScoreRepository scoreRepository)
         {
             InitializeComponent();
-            this.BindingContext = new GameScreenViewModel
+            this.gameScreenViewModel = new GameScreenViewModel
             {
                 Rows = ROWS,
                 Cols = COLS,
-                IsGameOver = false
+                State = GameState.Running,
+                Score = 0,
             };
 
-            this.gameState = GameState.Running;
-            this.currentPoints = 0;
+            this.BindingContext = this.gameScreenViewModel;
+
             this.currentMoves = 0;
             this.game = new GameModel(this.GameGrid, ROWS, COLS);
             this.scoreRepository = scoreRepository;
@@ -37,7 +37,7 @@ namespace Game2048
 
         public async void OnSwiped(object sender, SwipedEventArgs e)
         {
-            if (this.gameState != GameState.Running)
+            if (this.gameScreenViewModel.State != GameState.Running)
             {
                 return;
             }
@@ -201,7 +201,7 @@ namespace Game2048
                 var currentTypeValue = (int)this.game.Grid[row, col].Type;
                 var newValue = currentTypeValue * 2;
                 nextCellType = (CellType)newValue;
-                this.currentPoints += newValue;
+                this.gameScreenViewModel.Score += newValue;
                 this.game.SetHorizontalBorder(col, row);
                 this.game.SetVerticalBorder(row, col);
                 updateBorder = true;
@@ -214,7 +214,7 @@ namespace Game2048
 
             await this.SwitchGameStateAsync(GameState.Running);
 
-            this.currentPoints = 0;
+            this.gameScreenViewModel.Score = 0;
             this.currentMoves = 0;
         }
 
@@ -222,17 +222,10 @@ namespace Game2048
         {
             if (state != GameState.Running)
             {
-                await scoreRepository.SaveScoreAsync(new Score { Id = Guid.NewGuid(), CreatedOn = DateTime.Now, Moves = this.currentMoves, Points = this.currentPoints });
+                await scoreRepository.SaveScoreAsync(new Score { Id = Guid.NewGuid(), CreatedOn = DateTime.Now, Moves = this.currentMoves, Points = this.gameScreenViewModel.Score });
             }
 
-            this.gameState = state;
-            this.BindingContext = new GameScreenViewModel
-            {
-                Rows = ROWS,
-                Cols = COLS,
-                IsGameOver = state != GameState.Running,
-                Text = state.GetDescription(),
-            };
+            this.gameScreenViewModel.State = state;
         }
     }
 }

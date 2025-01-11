@@ -6,23 +6,23 @@ namespace Game2048.Models
     public class GameModel
     {
         private readonly HashSet<int> usedCellIndexes;
-        private readonly HashSet<int> updatedThisTurn;
         private readonly GameGrid gameGridView;
         private readonly int rowsCount;
         private readonly int colsCount;
 
-        public GameCellModel[,] Grid { get; private set; }
+        private List<int?> horizontalBorders;
+        private List<int?> verticalBorders;
 
-        public int? HorizontalBorder { get; set; }
-        public int? VerticalBorder { get; set; }
+        public GameCellModel[,] Grid { get; private set; }
 
         public GameModel(GameGrid gameGridView, int rows, int cols)
         {
             this.usedCellIndexes = [];
-            this.updatedThisTurn = [];
             this.gameGridView = gameGridView;
             this.rowsCount = rows;
             this.colsCount = cols;
+
+            this.ResetBorders();
 
             this.InitializeGrid();
         }
@@ -48,6 +48,7 @@ namespace Game2048.Models
                     }
                 }
             }
+
             this.gameGridView.SetGrid(this.Grid);
         }
 
@@ -130,6 +131,26 @@ namespace Game2048.Models
                 default:
                     break;
             }
+        }
+
+        public void ResetBorders()
+        {
+            this.horizontalBorders = Enumerable.Repeat<int?>(null, this.rowsCount).ToList();
+            this.verticalBorders = Enumerable.Repeat<int?>(null, this.colsCount).ToList();
+        }
+
+        public int? GetHorizontalBorder(int col) => this.horizontalBorders[col];
+
+        public int? GetVerticalBorder(int row) => this.verticalBorders[row];
+
+        public void SetHorizontalBorder(int col, int value)
+        {
+            this.horizontalBorders[col] = value;
+        }
+
+        public void SetVerticalBorder(int row, int value)
+        {
+            this.verticalBorders[row] = value;
         }
 
         private int GetIndex(int row, int col) => this.colsCount * row + col;

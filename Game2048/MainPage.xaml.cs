@@ -58,13 +58,23 @@ namespace Game2048
                             var updateAtRow = i;
                             var updateAtCol = j;
 
+
+                            var horizontalBorder = this.game.GetHorizontalBorder(updateAtCol);
+                            var verticalBorder = this.game.GetVerticalBorder(updateAtRow);
+
                             if (e.Direction == SwipeDirection.Left)
                             {
+
                                 while (updateAtCol > 0 && 
                                     (this.game.Grid[i, updateAtCol - 1].Type == CellType.Empty || this.game.Grid[i, updateAtCol - 1].Type == nextCellType) &&
-                                    (this.game.VerticalBorder is null || (updateAtCol - 1 < this.game.VerticalBorder)))
+                                    (verticalBorder is null || (updateAtCol - 1 > verticalBorder)))
                                 {
-                                    this.PrepareCellType(updateAtRow, updateAtCol, i, updateAtCol - 1, ref nextCellType);
+                                    this.PrepareCellType(updateAtRow, updateAtCol, i, updateAtCol - 1, ref nextCellType, out bool updateBorder);
+
+                                    if (updateBorder)
+                                    {
+                                        verticalBorder = this.game.GetVerticalBorder(i);
+                                    }
                                     updateAtCol--;
                                 }
                             }
@@ -73,9 +83,14 @@ namespace Game2048
                             {
                                 while (updateAtRow > 0 && 
                                     (this.game.Grid[updateAtRow - 1, j].Type == CellType.Empty || this.game.Grid[updateAtRow - 1, j].Type == nextCellType) &&
-                                    (this.game.HorizontalBorder is null || (updateAtRow - 1 > this.game.HorizontalBorder)))
+                                    (horizontalBorder is null || (updateAtRow - 1 > horizontalBorder)))
                                 {
-                                    this.PrepareCellType(updateAtRow, updateAtCol, updateAtRow - 1, j, ref nextCellType);
+                                    this.PrepareCellType(updateAtRow, updateAtCol, updateAtRow - 1, j, ref nextCellType, out bool updateBorder);
+
+                                    if (updateBorder)
+                                    {
+                                        horizontalBorder = this.game.GetHorizontalBorder(j);
+                                    }
                                     updateAtRow--;
                                 }
                             }
@@ -94,8 +109,6 @@ namespace Game2048
 
                             tasks.Add(this.game.MoveCellAsync(e.Direction, nextCellType, i, updateAtRow, j, updateAtCol));
                         }
-                        this.game.HorizontalBorder = null;
-                        this.game.VerticalBorder = null;
                     }
                 }
             }
@@ -114,13 +127,21 @@ namespace Game2048
                             var updateAtRow = i;
                             var updateAtCol = j;
 
+                            var horizontalBorder = this.game.GetHorizontalBorder(j);
+                            var verticalBorder = this.game.GetVerticalBorder(i);
+
                             if (e.Direction == SwipeDirection.Right)
                             {
                                 while (updateAtCol < this.game.Grid.GetLength(1) - 1 && 
                                     (this.game.Grid[i, updateAtCol + 1].Type == CellType.Empty || this.game.Grid[i, updateAtCol + 1].Type == nextCellType) &&
-                                    (this.game.VerticalBorder is null || (updateAtCol + 1 < this.game.VerticalBorder)))
+                                    (verticalBorder is null || (updateAtCol + 1 < verticalBorder)))
                                 {
-                                    this.PrepareCellType(updateAtRow, updateAtCol, i, updateAtCol + 1, ref nextCellType);
+                                    this.PrepareCellType(updateAtRow, updateAtCol, i, updateAtCol + 1, ref nextCellType, out bool updateBorder);
+
+                                    if (updateBorder)
+                                    {
+                                        verticalBorder = this.game.GetVerticalBorder(i);
+                                    }
                                     updateAtCol++;
                                 }
                             }
@@ -129,9 +150,14 @@ namespace Game2048
                             {
                                 while (updateAtRow < this.game.Grid.GetLength(0) - 1 && 
                                     (this.game.Grid[updateAtRow + 1, j].Type == CellType.Empty || this.game.Grid[updateAtRow + 1, j].Type == nextCellType) &&
-                                    (this.game.HorizontalBorder is null || (updateAtRow + 1 < this.game.HorizontalBorder)))
+                                    (horizontalBorder is null || (updateAtRow + 1 < horizontalBorder)))
                                 {
-                                    this.PrepareCellType(updateAtRow, updateAtCol, updateAtRow + 1, j, ref nextCellType);
+                                    this.PrepareCellType(updateAtRow, updateAtCol, updateAtRow + 1, j, ref nextCellType, out bool updateBorder);
+
+                                    if (updateBorder)
+                                    {
+                                        horizontalBorder = this.game.GetHorizontalBorder(j);
+                                    }
                                     updateAtRow++;
                                 }
                             }
@@ -158,8 +184,7 @@ namespace Game2048
             await Task.WhenAll(tasks);
             var canCreateNewCell = this.game.CreateNewBaseCell();
             this.currentMoves++;
-            this.game.HorizontalBorder = null;
-            this.game.VerticalBorder = null;
+            this.game.ResetBorders();
 
             if (!canCreateNewCell)
             {
@@ -167,16 +192,19 @@ namespace Game2048
             }
         }
 
-        private void PrepareCellType(int prevRow, int prevCol, int row, int col, ref CellType nextCellType)
+        private void PrepareCellType(int prevRow, int prevCol, int row, int col, ref CellType nextCellType, out bool updateBorder)
         {
+            updateBorder = false;
+
             if (this.game.Grid[row, col].Type == nextCellType)
             {
                 var currentTypeValue = (int)this.game.Grid[row, col].Type;
                 var newValue = currentTypeValue * 2;
                 nextCellType = (CellType)newValue;
                 this.currentPoints += newValue;
-                this.game.HorizontalBorder = row;
-                this.game.VerticalBorder = col;
+                this.game.SetHorizontalBorder(col, row);
+                this.game.SetVerticalBorder(row, col);
+                updateBorder = true;
             }
         }
         private async void OnNewGameBtnClicked(object sender, EventArgs e)

@@ -1,5 +1,4 @@
-﻿
-using Game2048.DataAccess.Repositories;
+﻿using Game2048.DataAccess.Repositories;
 using Game2048.Models;
 using Game2048.Models.Enums;
 using Game2048.Models.Extensions;

@@ -6,15 +6,20 @@ namespace Game2048.Models
     public class GameModel
     {
         private readonly HashSet<int> usedCellIndexes;
+        private readonly HashSet<int> updatedThisTurn;
         private readonly GameGrid gameGridView;
         private readonly int rowsCount;
         private readonly int colsCount;
 
         public GameCellModel[,] Grid { get; private set; }
 
+        public int? HorizontalBorder { get; set; }
+        public int? VerticalBorder { get; set; }
+
         public GameModel(GameGrid gameGridView, int rows, int cols)
         {
-            this.usedCellIndexes = new HashSet<int>();
+            this.usedCellIndexes = [];
+            this.updatedThisTurn = [];
             this.gameGridView = gameGridView;
             this.rowsCount = rows;
             this.colsCount = cols;
@@ -125,7 +130,6 @@ namespace Game2048.Models
                 default:
                     break;
             }
-            //this.UpdateAt(toRow, toCol, cellType);
         }
 
         private int GetIndex(int row, int col) => this.colsCount * row + col;

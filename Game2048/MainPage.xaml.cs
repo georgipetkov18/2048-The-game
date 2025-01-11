@@ -1,4 +1,5 @@
-﻿using Game2048.DataAccess.Repositories;
+﻿using Game2048.DataAccess.Entities;
+using Game2048.DataAccess.Repositories;
 using Game2048.Models;
 using Game2048.Models.Enums;
 using Game2048.Models.Extensions;
@@ -12,6 +13,8 @@ namespace Game2048
         private const int COLS = 4;
         private readonly ScoreRepository scoreRepository;
         private GameState gameState;
+        private int currentPoints;
+        private int currentMoves;
 
         private GameModel game;
 
@@ -26,6 +29,8 @@ namespace Game2048
             };
 
             this.gameState = GameState.Running;
+            this.currentPoints = 0;
+            this.currentMoves = 0;
             this.game = new GameModel(this.GameGrid, ROWS, COLS);
             this.scoreRepository = scoreRepository;
         }
@@ -55,7 +60,9 @@ namespace Game2048
 
                             if (e.Direction == SwipeDirection.Left)
                             {
-                                while (updateAtCol > 0 && (this.game.Grid[i, updateAtCol - 1].Type == CellType.Empty || this.game.Grid[i, updateAtCol - 1].Type == nextCellType))
+                                while (updateAtCol > 0 && 
+                                    (this.game.Grid[i, updateAtCol - 1].Type == CellType.Empty || this.game.Grid[i, updateAtCol - 1].Type == nextCellType) &&
+                                    (this.game.VerticalBorder is null || (updateAtCol - 1 < this.game.VerticalBorder)))
                                 {
                                     this.PrepareCellType(updateAtRow, updateAtCol, i, updateAtCol - 1, ref nextCellType);
                                     updateAtCol--;
@@ -64,7 +71,9 @@ namespace Game2048
 
                             else if (e.Direction == SwipeDirection.Up)
                             {
-                                while (updateAtRow > 0 && (this.game.Grid[updateAtRow - 1, j].Type == CellType.Empty || this.game.Grid[updateAtRow - 1, j].Type == nextCellType))
+                                while (updateAtRow > 0 && 
+                                    (this.game.Grid[updateAtRow - 1, j].Type == CellType.Empty || this.game.Grid[updateAtRow - 1, j].Type == nextCellType) &&
+                                    (this.game.HorizontalBorder is null || (updateAtRow - 1 > this.game.HorizontalBorder)))
                                 {
                                     this.PrepareCellType(updateAtRow, updateAtCol, updateAtRow - 1, j, ref nextCellType);
                                     updateAtRow--;
@@ -80,13 +89,13 @@ namespace Game2048
 
                             if (nextCellType == CellType.Type2048)
                             {
-                                // TODO: Add proper score to repository
-                                await scoreRepository.SaveScoreAsync(new DataAccess.Entities.Score { Id = Guid.NewGuid(), CreatedOn = DateTime.Now, Moves = 0, Points = 2048 });
-                                this.SwitchGameState(GameState.Won);
+                                await this.SwitchGameStateAsync(GameState.Won);
                             }
 
                             tasks.Add(this.game.MoveCellAsync(e.Direction, nextCellType, i, updateAtRow, j, updateAtCol));
                         }
+                        this.game.HorizontalBorder = null;
+                        this.game.VerticalBorder = null;
                     }
                 }
             }
@@ -107,7 +116,9 @@ namespace Game2048
 
                             if (e.Direction == SwipeDirection.Right)
                             {
-                                while (updateAtCol < this.game.Grid.GetLength(1) - 1 && (this.game.Grid[i, updateAtCol + 1].Type == CellType.Empty || this.game.Grid[i, updateAtCol + 1].Type == nextCellType))
+                                while (updateAtCol < this.game.Grid.GetLength(1) - 1 && 
+                                    (this.game.Grid[i, updateAtCol + 1].Type == CellType.Empty || this.game.Grid[i, updateAtCol + 1].Type == nextCellType) &&
+                                    (this.game.VerticalBorder is null || (updateAtCol + 1 < this.game.VerticalBorder)))
                                 {
                                     this.PrepareCellType(updateAtRow, updateAtCol, i, updateAtCol + 1, ref nextCellType);
                                     updateAtCol++;
@@ -116,7 +127,9 @@ namespace Game2048
 
                             else if (e.Direction == SwipeDirection.Down)
                             {
-                                while (updateAtRow < this.game.Grid.GetLength(0) - 1 && (this.game.Grid[updateAtRow + 1, j].Type == CellType.Empty || this.game.Grid[updateAtRow + 1, j].Type == nextCellType))
+                                while (updateAtRow < this.game.Grid.GetLength(0) - 1 && 
+                                    (this.game.Grid[updateAtRow + 1, j].Type == CellType.Empty || this.game.Grid[updateAtRow + 1, j].Type == nextCellType) &&
+                                    (this.game.HorizontalBorder is null || (updateAtRow + 1 < this.game.HorizontalBorder)))
                                 {
                                     this.PrepareCellType(updateAtRow, updateAtCol, updateAtRow + 1, j, ref nextCellType);
                                     updateAtRow++;
@@ -127,14 +140,13 @@ namespace Game2048
                             {
                                 continue;
                             }
+
                             this.game.Grid[i, j] = new GameCellModel(CellType.Empty);
                             this.game.Grid[updateAtRow, updateAtCol] = new GameCellModel(nextCellType);
 
                             if (nextCellType == CellType.Type2048)
                             {
-                                // TODO: Add proper score to repository
-                                await scoreRepository.SaveScoreAsync(new DataAccess.Entities.Score { Id = Guid.NewGuid(), CreatedOn = DateTime.Now, Moves = 0, Points = 2048 });
-                                this.SwitchGameState(GameState.Won);
+                                await this.SwitchGameStateAsync(GameState.Won);
                             }
 
                             tasks.Add(this.game.MoveCellAsync(e.Direction, nextCellType, i, updateAtRow, j, updateAtCol));
@@ -145,10 +157,13 @@ namespace Game2048
 
             await Task.WhenAll(tasks);
             var canCreateNewCell = this.game.CreateNewBaseCell();
+            this.currentMoves++;
+            this.game.HorizontalBorder = null;
+            this.game.VerticalBorder = null;
 
             if (!canCreateNewCell)
             {
-                this.SwitchGameState(GameState.Lost);
+                await this.SwitchGameStateAsync(GameState.Lost);
             }
         }
 
@@ -157,18 +172,31 @@ namespace Game2048
             if (this.game.Grid[row, col].Type == nextCellType)
             {
                 var currentTypeValue = (int)this.game.Grid[row, col].Type;
-                nextCellType = (CellType)(currentTypeValue * 2);
+                var newValue = currentTypeValue * 2;
+                nextCellType = (CellType)newValue;
+                this.currentPoints += newValue;
+                this.game.HorizontalBorder = row;
+                this.game.VerticalBorder = col;
             }
         }
-        private void OnNewGameBtnClicked(object sender, EventArgs e)
+        private async void OnNewGameBtnClicked(object sender, EventArgs e)
         {
             this.GameGrid.InitializeGrid();
             this.game = new GameModel(this.GameGrid, ROWS, COLS);
-            this.SwitchGameState(GameState.Running);
+
+            await this.SwitchGameStateAsync(GameState.Running);
+
+            this.currentPoints = 0;
+            this.currentMoves = 0;
         }
 
-        private void SwitchGameState(GameState state)
+        private async Task SwitchGameStateAsync(GameState state)
         {
+            if (state != GameState.Running)
+            {
+                await scoreRepository.SaveScoreAsync(new Score { Id = Guid.NewGuid(), CreatedOn = DateTime.Now, Moves = this.currentMoves, Points = this.currentPoints });
+            }
+
             this.gameState = state;
             this.BindingContext = new GameScreenViewModel
             {

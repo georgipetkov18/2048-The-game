@@ -62,31 +62,12 @@ public partial class GameGrid : ContentView
 
     public void SetAt(int row, int col, CellType cellType)
     {
-        var children = this.grid.Children
-                .Where(c => this.grid.GetRow(c) == row && this.grid.GetColumn(c) == col)
-                .ToList();
-
-        if (children.Count > 0)
-        {
-            children.ForEach(c => this.grid.Children.Remove(c));
-        }
+        this.grid.Children.Remove(this[row, col]);
 
         var gameCell = new GameCell(new GameCellModel(cellType));
-        var border = new Border
-        {
-            Stroke = Colors.LightGray,
-            StrokeThickness = 2,
-            StrokeShape = new RoundRectangle
-            {
-                CornerRadius = new CornerRadius(10)
-            },
-        };
-        this.grid.Children.Add(gameCell);
-        this.grid.Children.Add(border);
+        this.grid.Add(gameCell);
         this.grid.SetRow(gameCell, row);
-        this.grid.SetRow(border, row);
         this.grid.SetColumn(gameCell, col);
-        this.grid.SetColumn(border, col);
 
         this.Content = this.grid;
     }

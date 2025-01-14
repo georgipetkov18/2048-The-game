@@ -68,7 +68,7 @@ namespace Game2048.Models
             }
         }
 
-        public bool CreateNewBaseCell()
+        public void CreateNewBaseCell()
         {
             var generatedIndexes = new HashSet<int>();
             int cellIndex;
@@ -79,7 +79,7 @@ namespace Game2048.Models
 
                 if (generatedIndexes.Count == this.rowsCount * this.colsCount)
                 {
-                    return false;
+                    return;
                 }
 
             }
@@ -88,6 +88,30 @@ namespace Game2048.Models
             var gridPosition = this.GetGridPosition(cellIndex);
 
             this.UpdateAt(gridPosition.Item1, gridPosition.Item2, CellType.Type2);
+        }
+
+        public bool IsGameOver()
+        {
+            if (this.usedCellIndexes.Count != this.rowsCount * this.colsCount)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < this.Grid.GetLength(0); i++)
+            {
+                for (int j = 0; j < this.Grid.GetLength(1); j++)
+                {
+                    var currentCellType = this.Grid[i, j].Type;
+
+                    if ((i > 0 && this.Grid[i - 1, j].Type == currentCellType) ||
+                        (j < this.Grid.GetLength(1) - 1 && this.Grid[i, j + 1].Type == currentCellType) ||
+                        (i < this.Grid.GetLength(0) - 1 && this.Grid[i + 1, j].Type == currentCellType) ||
+                        (j > 0 && this.Grid[i, j - 1].Type == currentCellType))
+                    {
+                        return false;
+                    }
+                }
+            }
 
             return true;
         }

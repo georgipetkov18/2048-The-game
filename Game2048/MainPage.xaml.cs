@@ -42,6 +42,8 @@ namespace Game2048
                 return;
             }
 
+            var movementHasOccured = false;
+
             var tasks = new List<Task>();
 
             if (e.Direction == SwipeDirection.Left || e.Direction == SwipeDirection.Up)
@@ -65,7 +67,7 @@ namespace Game2048
                             if (e.Direction == SwipeDirection.Left)
                             {
 
-                                while (updateAtCol > 0 && 
+                                while (updateAtCol > 0 &&
                                     (this.game.Grid[i, updateAtCol - 1].Type == CellType.Empty || this.game.Grid[i, updateAtCol - 1].Type == nextCellType) &&
                                     (verticalBorder is null || (updateAtCol - 1 > verticalBorder)))
                                 {
@@ -81,7 +83,7 @@ namespace Game2048
 
                             else if (e.Direction == SwipeDirection.Up)
                             {
-                                while (updateAtRow > 0 && 
+                                while (updateAtRow > 0 &&
                                     (this.game.Grid[updateAtRow - 1, j].Type == CellType.Empty || this.game.Grid[updateAtRow - 1, j].Type == nextCellType) &&
                                     (horizontalBorder is null || (updateAtRow - 1 > horizontalBorder)))
                                 {
@@ -99,6 +101,7 @@ namespace Game2048
                             {
                                 continue;
                             }
+
                             this.game.Grid[i, j] = new GameCellModel(CellType.Empty);
                             this.game.Grid[updateAtRow, updateAtCol] = new GameCellModel(nextCellType);
 
@@ -108,6 +111,7 @@ namespace Game2048
                             }
 
                             tasks.Add(this.game.MoveCellAsync(e.Direction, nextCellType, i, updateAtRow, j, updateAtCol));
+                            movementHasOccured = true;
                         }
                     }
                 }
@@ -132,7 +136,7 @@ namespace Game2048
 
                             if (e.Direction == SwipeDirection.Right)
                             {
-                                while (updateAtCol < this.game.Grid.GetLength(1) - 1 && 
+                                while (updateAtCol < this.game.Grid.GetLength(1) - 1 &&
                                     (this.game.Grid[i, updateAtCol + 1].Type == CellType.Empty || this.game.Grid[i, updateAtCol + 1].Type == nextCellType) &&
                                     (verticalBorder is null || (updateAtCol + 1 < verticalBorder)))
                                 {
@@ -148,7 +152,7 @@ namespace Game2048
 
                             else if (e.Direction == SwipeDirection.Down)
                             {
-                                while (updateAtRow < this.game.Grid.GetLength(0) - 1 && 
+                                while (updateAtRow < this.game.Grid.GetLength(0) - 1 &&
                                     (this.game.Grid[updateAtRow + 1, j].Type == CellType.Empty || this.game.Grid[updateAtRow + 1, j].Type == nextCellType) &&
                                     (horizontalBorder is null || (updateAtRow + 1 < horizontalBorder)))
                                 {
@@ -176,19 +180,26 @@ namespace Game2048
                             }
 
                             tasks.Add(this.game.MoveCellAsync(e.Direction, nextCellType, i, updateAtRow, j, updateAtCol));
+                            movementHasOccured = true;
                         }
                     }
                 }
             }
 
             await Task.WhenAll(tasks);
-            var canCreateNewCell = this.game.CreateNewBaseCell();
-            this.currentMoves++;
-            this.game.ResetBorders();
 
-            if (!canCreateNewCell)
+            if (movementHasOccured)
             {
-                await this.SwitchGameStateAsync(GameState.Lost);
+                this.game.CreateNewBaseCell();
+                this.currentMoves++;
+                this.game.ResetBorders();
+
+                var isGameOver = this.game.IsGameOver();
+
+                if (isGameOver)
+                {
+                    await this.SwitchGameStateAsync(GameState.Lost);
+                }
             }
         }
 

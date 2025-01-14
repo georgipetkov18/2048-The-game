@@ -12,5 +12,7 @@ namespace Game2048.DataAccess.Entities
         public DateTime CreatedOn { get; set; }
 
         public int Moves { get; set; }
+
+        public bool IsGameWon { get; set; }
     }
 }

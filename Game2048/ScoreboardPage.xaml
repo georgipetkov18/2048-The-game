@@ -22,12 +22,15 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
+                    <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
                 <Label Text="Points" Grid.Row="0" Grid.Column="0" HorizontalTextAlignment="Center" FontSize="18" FontAttributes="Bold"/>
                 <Label Text="Moves" Grid.Row="0" Grid.Column="1" HorizontalTextAlignment="Center" FontSize="18" FontAttributes="Bold"/>
                 <Label Text="Date" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" HorizontalTextAlignment="Center" FontSize="18" FontAttributes="Bold"/>
-                <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Stroke="LightGray" Margin="0,10,0,0"/>
+                <Label Text="State" Grid.Row="0" Grid.Column="4" HorizontalTextAlignment="Center" FontSize="18" FontAttributes="Bold"/>
+
+                <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Stroke="LightGray" Margin="0,10,0,0"/>
             </Grid>
             <ListView x:Name="ListView" ItemsSource="{Binding Scores}">
                 <ListView.ItemTemplate>
@@ -43,11 +46,13 @@
                                     <ColumnDefinition />
                                     <ColumnDefinition />
                                     <ColumnDefinition />
+                                    <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
 
                                 <Label Text="{Binding Points}" Grid.Row="0" Grid.Column="0" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="16"/>
                                 <Label Text="{Binding Moves}" Grid.Row="0" Grid.Column="1" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="16"/>
                                 <Label Text="{Binding Date}" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="16"/>
+                                <Label Text="{Binding State}" Grid.Row="0" Grid.Column="4" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="16"/>
                             </Grid>
                         </ViewCell>
                     </DataTemplate>

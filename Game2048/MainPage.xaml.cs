@@ -233,7 +233,14 @@ namespace Game2048
         {
             if (state != GameState.Running)
             {
-                await scoreRepository.SaveScoreAsync(new Score { Id = Guid.NewGuid(), CreatedOn = DateTime.Now, Moves = this.currentMoves, Points = this.gameScreenViewModel.Score });
+                await scoreRepository.SaveScoreAsync(new Score 
+                { 
+                    Id = Guid.NewGuid(), 
+                    CreatedOn = DateTime.Now,
+                    Moves = this.currentMoves,
+                    Points = this.gameScreenViewModel.Score,
+                    IsGameWon = state == GameState.Won,
+                });
             }
 
             this.gameScreenViewModel.State = state;

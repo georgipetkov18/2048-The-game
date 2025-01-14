@@ -27,7 +27,7 @@ public partial class ScoreboardPage : ContentPage
 
         foreach (var score in scores)
         {
-            this.Scores.Add(new ScoreboardPageViewModel(score.Points, score.CreatedOn.ToString("dd.MM.yyyy HH:mm"), score.Moves));
+            this.Scores.Add(new ScoreboardPageViewModel(score.Points, score.CreatedOn.ToString("dd.MM.yyyy HH:mm"), score.Moves, score.IsGameWon ? "Win" : "Loss"));
         }
     }
 }

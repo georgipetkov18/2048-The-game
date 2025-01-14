@@ -23,7 +23,11 @@ namespace Game2048.DataAccess.Repositories
         public async Task<List<Score>> GetScoresAsync()
         {
             await Init();
-            return await Database.Table<Score>().ToListAsync();
+            return await Database.Table<Score>()
+                .OrderByDescending(s => s.Points)
+                .ThenBy(s => s.Moves)
+                .ThenByDescending(s => s.CreatedOn)
+                .ToListAsync();
         }
 
         public async Task<Score> GetScoreAsync(Guid id)

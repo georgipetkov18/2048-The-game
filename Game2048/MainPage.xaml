@@ -25,7 +25,7 @@
                 <Label Grid.Row="0" Grid.Column="0" FontSize="17" Margin="0, 25, 0, 0">Score:</Label>
                 <Label Grid.Row="0" Grid.Column="1" FontSize="17" Margin="25, 25, 15, 0" Text="{Binding Score}"></Label>
             </Grid>
-            <Button Text="Start new game" BackgroundColor="Gray" FontSize="25" WidthRequest="230" Margin="30" Padding="15" Clicked="OnNewGameBtnClicked"></Button>
+            <Button Text="Start new game" BackgroundColor="{StaticResource Gray400}" TextColor="{StaticResource White}" FontSize="25" WidthRequest="230" Margin="30" Padding="15" Clicked="OnNewGameBtnClicked"></Button>
         </VerticalStackLayout>
     </ScrollView>
 
